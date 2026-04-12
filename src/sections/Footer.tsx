@@ -1,140 +1,98 @@
-import { Instagram, Facebook, Twitter, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { Mail, PhoneCall, MessageCircle } from 'lucide-react';
 import { footerConfig } from '../config';
-
-const iconMap: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
-  Instagram,
-  Facebook,
-  Twitter,
-};
 
 const Footer = () => {
   if (!footerConfig.brandName) return null;
 
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const companyLinks = [
+    'About WaterScience',
+    'Team',
+    'Careers',
+    'Dealership/ Distributorship',
+    'In the Press',
+    'Blog',
+    'Find the Nearest Store',
+  ];
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubscribed(true);
-      setEmail('');
-      setTimeout(() => setIsSubscribed(false), 3000);
-    }
-  };
+  const policyLinks = [
+    'Privacy Policy',
+    'Terms of Use',
+    'Warranty and Support',
+    'Billing and Shipping',
+    'Returns and Refund',
+  ];
 
-  const scrollToSection = (href: string) => {
-    if (href === '#') return;
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const supportLinks = ['Contact Us', 'Book Consultation', 'Register Warranty', 'Track Order', 'Account', 'Manage Subscriptions'];
 
   return (
-    <footer className="bg-white py-16 md:py-24">
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-          {/* Company Info */}
-          <div className="lg:col-span-1">
-            <h3 className="font-serif text-2xl mb-6">{footerConfig.brandName}</h3>
-            <p className="text-[#696969] font-light text-sm leading-relaxed mb-6">
-              {footerConfig.brandDescription}
-            </p>
-            <div className="flex items-center gap-4">
-              {footerConfig.socialLinks.map((social) => {
-                const IconComponent = iconMap[social.icon];
-                if (!IconComponent) return null;
-                return (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    className="text-[#696969] hover:text-[#8b6d4b] transition-all duration-300 hover:scale-90"
-                    aria-label={social.label}
-                  >
-                    <IconComponent size={20} strokeWidth={1.5} />
-                  </a>
-                );
-              })}
-            </div>
+    <footer id="footer" className="bg-[#f4f6f8] py-14 md:py-16">
+      <div className="mx-auto max-w-[1240px] px-4 md:px-6">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <h3 className="mb-5 font-display text-[32px] font-semibold text-[#1e2b38]">Company</h3>
+            <ul className="space-y-3 text-[16px] text-[#2f3f4f]">
+              {companyLinks.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </div>
 
-          {/* Link Groups */}
-          {footerConfig.linkGroups.map((group) => (
-            <div key={group.title}>
-              <h4 className="font-sans text-sm font-medium uppercase tracking-wider mb-6">{group.title}</h4>
-              <ul className="space-y-3">
-                {group.links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        scrollToSection(link.href);
-                      }}
-                      className="text-[#696969] text-base font-light link-hover inline-block"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div>
+            <h3 className="mb-5 font-display text-[32px] font-semibold text-[#1e2b38]">Policy</h3>
+            <ul className="space-y-3 text-[16px] text-[#2f3f4f]">
+              {policyLinks.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
 
-          {/* Newsletter */}
-          {footerConfig.newsletterHeading && (
-            <div className="lg:col-span-1">
-              <h4 className="font-sans text-sm font-medium uppercase tracking-wider mb-6">{footerConfig.newsletterHeading}</h4>
-              <p className="text-[#696969] text-sm font-light mb-4">
-                {footerConfig.newsletterDescription}
+          <div>
+            <h3 className="mb-5 font-display text-[32px] font-semibold text-[#1e2b38]">Support</h3>
+            <ul className="space-y-3 text-[16px] text-[#2f3f4f]">
+              {supportLinks.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-5 font-display text-[32px] font-semibold text-[#1e2b38]">Contact</h3>
+            <ul className="space-y-4 text-[16px] text-[#2f3f4f]">
+              <li className="flex items-center gap-3">
+                <Mail size={18} className="text-[#0f5da0]" />
+                care@waterscience.in
+              </li>
+              <li className="flex items-center gap-3">
+                <PhoneCall size={18} className="text-[#0f5da0]" />
+                1800-121-0599
+              </li>
+              <li className="flex items-center gap-3">
+                <MessageCircle size={18} className="text-[#0f5da0]" />
+                +91 91485 45840
+              </li>
+            </ul>
+
+            <div className="mt-6 space-y-3 text-[16px] leading-7 text-[#2f3f4f]">
+              <p>
+                <span className="font-semibold text-[#1e2b38]">Manufacturer Name</span> -
+                <br />
+                Aquagenics R and D India Pvt. Ltd.
               </p>
-              <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
-                <div className="relative">
-                  <input
-                    type="email"
-                    placeholder={footerConfig.newsletterPlaceholder}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-[#8b6d4b] transition-colors"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-[#8b6d4b] text-white text-sm font-light tracking-wider btn-hover"
-                >
-                  {isSubscribed ? (
-                    <span>{footerConfig.newsletterSuccessText}</span>
-                  ) : (
-                    <>
-                      <span>{footerConfig.newsletterButtonText}</span>
-                      <ArrowRight size={14} />
-                    </>
-                  )}
-                </button>
-              </form>
+              <p>
+                <span className="font-semibold text-[#1e2b38]">Manufacturer Address</span> - A31,
+                <br />
+                NGEF Estate, Whitefield Main Rd,
+                <br />
+                Mahadevapura, Bengaluru,
+                <br />
+                Karnataka 560048
+              </p>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="mt-16 pt-8 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[#333] text-xs uppercase tracking-wider font-medium">
-              {footerConfig.copyrightText}
-            </p>
-            <div className="flex items-center gap-6">
-              {footerConfig.legalLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="text-[#696969] text-xs hover:text-black transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          </div>
+        <div className="mt-10 border-t border-[#d8e0e8] pt-6 text-sm text-[#5f7080]">
+          {footerConfig.copyrightText}
         </div>
       </div>
     </footer>

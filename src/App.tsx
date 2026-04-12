@@ -7,15 +7,9 @@ import Navigation from './sections/Navigation';
 import AdminDashboard from './sections/AdminDashboard';
 import Login from './sections/Login';
 import Hero from './sections/Hero';
-import SubHero from './sections/SubHero';
-import VideoSection from './sections/VideoSection';
 import Products from './sections/Products';
+import StoreHighlights from './sections/StoreHighlights';
 import ProductDetail from './sections/ProductDetail';
-import Features from './sections/Features';
-import Blog from './sections/Blog';
-import FAQ from './sections/FAQ';
-import About from './sections/About';
-import Contact from './sections/Contact';
 import Footer from './sections/Footer';
 
 interface CartItem {
@@ -89,14 +83,8 @@ function App() {
               />
               <main>
                 <Hero />
-                <SubHero />
-                <VideoSection />
                 <Products onAddToCart={handleAddToCart} />
-                <Features />
-                <Blog />
-                <FAQ />
-                <About />
-                <Contact />
+                <StoreHighlights />
               </main>
               <Footer />
             </>

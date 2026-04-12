@@ -1,5 +1,5 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { ShoppingBag, X, Search, Instagram, Facebook, Twitter } from 'lucide-react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { ChevronDown, CircleUserRound, MapPin, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { navigationConfig } from '../config';
 import { API_BASE_URL } from '@/lib/api-base-url';
 
@@ -21,18 +21,22 @@ interface NavigationProps {
   onClearCart: () => void;
 }
 
-const iconMap: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
-  Instagram,
-  Facebook,
-  Twitter,
-};
+interface CheckoutFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+}
 
 const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart }: NavigationProps) => {
   if (!navigationConfig.brandName) return null;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'details' | 'success'>('cart');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
@@ -48,26 +52,31 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
     postalCode: '',
   });
 
-  interface CheckoutFormData {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    postalCode: string;
-  }
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const primaryMenuLinks = [
+    { label: 'Categories', href: '#products', isDropdown: true },
+    { label: 'Replacement Cartridges', href: '#products' },
+    { label: 'Best Sellers', href: '#products' },
+    { label: 'For Hair and Skin', href: '#products' },
+    { label: 'On Sale', href: '#products' },
+    { label: 'Support', href: '#footer' },
+  ];
+
+  const productCategories = useMemo(
+    () => [
+      'Shower and Tap Filters',
+      'Appliance Filters',
+      'Kitchen Tap Extenders',
+      'Water Softeners',
+      'Health Faucets',
+      'Hard Water Cleaning Products',
+      'Mainline Filters',
+      'Whole House Softeners',
+    ],
+    []
+  );
 
   useEffect(() => {
     if (cartItems.length === 0 && checkoutStep !== 'success') {
@@ -93,6 +102,18 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
     const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}`;
     window.history.replaceState({}, '', nextUrl);
   }, [onClearCart]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-category-panel]')) {
+        setIsCategoryOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const closeCart = () => {
     setIsCartOpen(false);
@@ -173,7 +194,7 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
       if (payload.mode === 'demo') {
         onClearCart();
         setCheckoutStep('success');
-        setCheckoutInfo(payload.message ?? 'Payment & shipping simulated for demo');
+        setCheckoutInfo(payload.message ?? 'Payment and shipping simulated for demo');
         return;
       }
 
@@ -182,7 +203,6 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
       }
 
       window.location.href = payload.checkoutUrl;
-
     } catch (requestError) {
       setCheckoutError(requestError instanceof Error ? requestError.message : 'Unable to start payment right now');
     } finally {
@@ -192,6 +212,13 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
 
   const scrollToSection = (href: string) => {
     setIsMenuOpen(false);
+    setIsCategoryOpen(false);
+
+    if (href === '#') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -200,167 +227,149 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-white shadow-sm' : 'bg-transparent'
-        }`}
-      >
-        <div className="flex items-center justify-between h-[70px] px-6 md:px-12 lg:px-[170px]">
-          <a
-            href="#hero"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('#hero');
-            }}
-            className="font-serif text-2xl tracking-wide"
-            style={{ color: isScrolled ? '#000' : '#fff' }}
-          >
-            {navigationConfig.brandName}
-          </a>
-
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative btn-hover"
-              style={{ color: isScrolled ? '#8b6d4b' : '#fff' }}
-            >
-              <ShoppingBag size={22} strokeWidth={1.5} />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center text-xs text-white bg-[#8b6d4b] rounded-full">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setIsMenuOpen(true)}
-              className="flex flex-col gap-1.5 w-7 btn-hover"
-            >
-              <span
-                className={`h-[2px] w-full transition-all duration-300 ${
-                  isScrolled ? 'bg-black' : 'bg-white'
-                }`}
-              />
-              <span
-                className={`h-[2px] w-full transition-all duration-300 ${
-                  isScrolled ? 'bg-black' : 'bg-white'
-                }`}
-              />
-            </button>
-          </div>
+      <div className="sticky top-0 z-50 border-b border-[#d7dee6] bg-white">
+        <div className="bg-[#0f5da0] py-1.5 text-center text-xs font-bold tracking-[0.12em] text-white md:text-sm">
+          FREE DELIVERY ON ORDERS ABOVE INR 500
         </div>
-      </nav>
 
-      {/* Full Screen Menu */}
-      <div
-        className={`fixed inset-0 z-[9999] transition-all duration-700 ${
-          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-      >
-        <div className="absolute inset-0 bg-white" />
-        <div className="relative h-full flex">
-          <div className="flex-1 flex flex-col justify-center items-center px-8 lg:px-20">
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className="absolute top-6 right-6 lg:right-20 p-2 hover:opacity-60 transition-opacity"
-            >
-              <X size={28} strokeWidth={1.5} />
-            </button>
-
-            <div className="w-full max-w-md mb-8">
-              <div className="relative">
+        <header className="mx-auto max-w-[1240px] px-4 md:px-6">
+          <div className="flex items-center gap-3 py-4">
+            <div className="hidden flex-1 md:block">
+              <div className="flex max-w-[280px] items-center gap-2 rounded-full border border-[#cfd8e1] px-4 py-2.5">
+                <Search size={18} className="text-[#55687c]" />
                 <input
                   type="text"
                   placeholder={navigationConfig.searchPlaceholder}
-                  className="w-full py-3 border-b-2 border-[#8b6d4b] bg-transparent focus:outline-none font-light text-lg"
+                  className="w-full border-none bg-transparent text-[17px] text-[#2b3a49] outline-none"
                 />
-                <Search className="absolute right-0 top-1/2 -translate-y-1/2 text-[#8b6d4b]" size={20} />
               </div>
             </div>
 
-            <nav className="flex flex-col items-center gap-6">
-              {navigationConfig.menuLinks.map((link, index) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection(link.href);
-                  }}
-                  className="font-serif text-3xl lg:text-[45px] text-black hover:text-[#8b6d4b] transition-colors duration-300"
-                  style={{
-                    opacity: isMenuOpen ? 1 : 0,
-                    transform: isMenuOpen ? 'translateY(0)' : 'translateY(20px)',
-                    transition: `all 0.5s ease ${index * 0.1}s`,
-                  }}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
+            <a
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToSection('#');
+              }}
+              className="flex flex-1 items-center justify-center gap-2 text-[#0f5da0]"
+            >
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[#0f5da0] text-white">W</span>
+              <span className="text-2xl font-extrabold tracking-tight">waterscience</span>
+            </a>
 
-            <div className="flex items-center gap-6 mt-12">
-              {navigationConfig.socialLinks.map((social) => {
-                const IconComponent = iconMap[social.icon];
-                if (!IconComponent) return null;
-                return (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    className="text-[#696969] hover:text-[#8b6d4b] transition-colors"
-                    aria-label={social.label}
-                  >
-                    <IconComponent size={20} strokeWidth={1.5} />
-                  </a>
-                );
-              })}
+            <div className="flex flex-1 items-center justify-end gap-3">
+              <button className="hidden text-[#263444] md:block" aria-label="Account">
+                <CircleUserRound size={31} strokeWidth={1.7} />
+              </button>
+
+              <button onClick={() => setIsCartOpen(true)} className="relative text-[#0f5da0]" aria-label="Open cart">
+                <ShoppingBag size={31} strokeWidth={1.8} />
+                {totalItems > 0 && (
+                  <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#0f5da0] text-xs font-bold text-white">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+
+              <button
+                className="text-[#263444] md:hidden"
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+                aria-label="Open menu"
+              >
+                <Menu size={30} strokeWidth={1.8} />
+              </button>
             </div>
           </div>
 
-          {navigationConfig.menuBackgroundImage && (
-            <div
-              className="hidden lg:block w-[40%] bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${navigationConfig.menuBackgroundImage})`,
-                opacity: isMenuOpen ? 1 : 0,
-                transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)',
-                transition: 'all 0.7s ease 0.2s',
-              }}
-            />
-          )}
-        </div>
+          <div className="hidden border-t border-[#d7dee6] md:block" data-category-panel>
+            <div className="flex min-h-[56px] items-center gap-8 overflow-x-auto py-3 text-[#1f2b37]">
+              {primaryMenuLinks.map((link) => (
+                <button
+                  key={link.label}
+                  onClick={() => {
+                    if (link.isDropdown) {
+                      setIsCategoryOpen((prev) => !prev);
+                    } else {
+                      scrollToSection(link.href);
+                    }
+                  }}
+                  className="whitespace-nowrap text-[17px] font-medium hover:text-[#0f5da0]"
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {link.label}
+                    {link.isDropdown && <ChevronDown size={18} />}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {isCategoryOpen && (
+              <div className="rounded-md border border-[#d7dee6] bg-white p-5 shadow-lg">
+                <p className="mb-4 text-[18px] font-semibold text-[#1d2a38]">Products</p>
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+                  {productCategories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => scrollToSection('#products')}
+                      className="text-left text-[16px] text-[#2f4152] hover:text-[#0f5da0]"
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="py-2 md:py-3">
+            <button
+              className="inline-flex items-center gap-2 text-[17px] font-medium text-[#0f5da0] hover:underline"
+              onClick={() => scrollToSection('#footer')}
+            >
+              <MapPin size={16} />
+              Locate Our Store
+            </button>
+          </div>
+        </header>
+
+        {isMenuOpen && (
+          <div className="border-t border-[#d7dee6] bg-white px-4 py-3 md:hidden">
+            {primaryMenuLinks.map((link) => (
+              <button
+                key={`mobile-${link.label}`}
+                onClick={() => scrollToSection(link.href)}
+                className="block w-full border-b border-[#edf1f5] py-3 text-left text-[17px] font-medium text-[#243445]"
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Cart Sidebar */}
       <div
         className={`fixed inset-0 z-[9999] transition-opacity duration-300 ${
-          isCartOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          isCartOpen ? 'visible opacity-100' : 'invisible opacity-0'
         }`}
       >
-        <div
-          className="absolute inset-0 bg-black/40"
-          onClick={closeCart}
-        />
+        <div className="absolute inset-0 bg-black/40" onClick={closeCart} />
         <div
           className={`absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl transition-transform duration-500 ${
             isCartOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="font-serif text-2xl">{navigationConfig.brandName}</h3>
-              <button
-                onClick={closeCart}
-                className="p-2 hover:opacity-60 transition-opacity"
-              >
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between border-b p-6">
+              <h3 className="font-display text-2xl font-semibold">{navigationConfig.brandName}</h3>
+              <button onClick={closeCart} className="p-2 hover:opacity-60 transition-opacity">
                 <X size={24} strokeWidth={1.5} />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
               {checkoutStep === 'success' ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <div className="w-16 h-16 rounded-full bg-[#f2ece5] text-[#8b6d4b] flex items-center justify-center mb-4">
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#e6f0fb] text-[#0f5da0]">
                     <ShoppingBag size={30} strokeWidth={1.5} />
                   </div>
                   {IS_DEMO_MODE && (
@@ -368,26 +377,23 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                       Test Mode Order
                     </span>
                   )}
-                  <h4 className="font-serif text-2xl mb-2">Order Confirmed</h4>
-                  <p className="text-[#696969]">Thank you, {formData.firstName || 'Customer'}! We have received your order details.</p>
+                  <h4 className="mb-2 font-display text-2xl font-semibold">Order Confirmed</h4>
+                  <p className="text-[#566577]">Thank you, {formData.firstName || 'Customer'}! We have received your order details.</p>
                   {IS_DEMO_MODE && (
-                    <p className="mt-2 text-xs text-[#696969]">{checkoutInfo || 'Payment & shipping simulated for demo'}</p>
+                    <p className="mt-2 text-xs text-[#566577]">{checkoutInfo || 'Payment and shipping simulated for demo'}</p>
                   )}
-                  <button
-                    onClick={closeCart}
-                    className="mt-6 px-8 py-3 bg-[#8b6d4b] text-white font-light tracking-wide btn-hover"
-                  >
+                  <button onClick={closeCart} className="mt-6 rounded-sm bg-[#0f5da0] px-8 py-3 font-semibold text-white">
                     Continue Shopping
                   </button>
                 </div>
               ) : checkoutStep === 'details' ? (
                 <form onSubmit={handleCheckoutSubmit} className="space-y-4">
-                  <h4 className="font-serif text-2xl">Customer Details</h4>
-                  <p className="text-sm text-[#696969]">Complete your details to place the order.</p>
+                  <h4 className="font-display text-2xl font-semibold">Customer Details</h4>
+                  <p className="text-sm text-[#566577]">Complete your details to place the order.</p>
                   {IS_DEMO_MODE && (
                     <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
                       <p className="text-xs font-medium text-amber-800">Test Mode Order</p>
-                      <p className="text-xs text-amber-700">Payment & shipping simulated for demo</p>
+                      <p className="text-xs text-amber-700">Payment and shipping simulated for demo</p>
                     </div>
                   )}
 
@@ -398,9 +404,9 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                         value={formData.firstName}
                         onChange={(event) => handleFormChange('firstName', event.target.value)}
                         placeholder="First name"
-                        className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                        className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                       />
-                      {formErrors.firstName && <p className="text-xs text-red-500 mt-1">{formErrors.firstName}</p>}
+                      {formErrors.firstName && <p className="mt-1 text-xs text-red-500">{formErrors.firstName}</p>}
                     </div>
                     <div>
                       <input
@@ -408,9 +414,9 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                         value={formData.lastName}
                         onChange={(event) => handleFormChange('lastName', event.target.value)}
                         placeholder="Last name"
-                        className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                        className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                       />
-                      {formErrors.lastName && <p className="text-xs text-red-500 mt-1">{formErrors.lastName}</p>}
+                      {formErrors.lastName && <p className="mt-1 text-xs text-red-500">{formErrors.lastName}</p>}
                     </div>
                   </div>
 
@@ -420,9 +426,9 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                       value={formData.email}
                       onChange={(event) => handleFormChange('email', event.target.value)}
                       placeholder="Email address"
-                      className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                      className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                     />
-                    {formErrors.email && <p className="text-xs text-red-500 mt-1">{formErrors.email}</p>}
+                    {formErrors.email && <p className="mt-1 text-xs text-red-500">{formErrors.email}</p>}
                   </div>
 
                   <div>
@@ -431,9 +437,9 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                       value={formData.phone}
                       onChange={(event) => handleFormChange('phone', event.target.value)}
                       placeholder="Phone number"
-                      className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                      className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                     />
-                    {formErrors.phone && <p className="text-xs text-red-500 mt-1">{formErrors.phone}</p>}
+                    {formErrors.phone && <p className="mt-1 text-xs text-red-500">{formErrors.phone}</p>}
                   </div>
 
                   <div>
@@ -442,9 +448,9 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                       value={formData.address}
                       onChange={(event) => handleFormChange('address', event.target.value)}
                       placeholder="Street address"
-                      className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                      className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                     />
-                    {formErrors.address && <p className="text-xs text-red-500 mt-1">{formErrors.address}</p>}
+                    {formErrors.address && <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -454,9 +460,9 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                         value={formData.city}
                         onChange={(event) => handleFormChange('city', event.target.value)}
                         placeholder="City"
-                        className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                        className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                       />
-                      {formErrors.city && <p className="text-xs text-red-500 mt-1">{formErrors.city}</p>}
+                      {formErrors.city && <p className="mt-1 text-xs text-red-500">{formErrors.city}</p>}
                     </div>
                     <div>
                       <input
@@ -464,83 +470,67 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
                         value={formData.postalCode}
                         onChange={(event) => handleFormChange('postalCode', event.target.value)}
                         placeholder="Postal code"
-                        className="w-full border border-gray-200 px-3 py-2 focus:outline-none focus:border-[#8b6d4b]"
+                        className="w-full border border-gray-200 px-3 py-2 focus:border-[#0f5da0] focus:outline-none"
                       />
-                      {formErrors.postalCode && <p className="text-xs text-red-500 mt-1">{formErrors.postalCode}</p>}
+                      {formErrors.postalCode && <p className="mt-1 text-xs text-red-500">{formErrors.postalCode}</p>}
                     </div>
                   </div>
 
-                  <div className="border-t border-gray-100 pt-4 mt-6">
-                    {checkoutError && (
-                      <p className="text-xs text-red-500 mb-3">{checkoutError}</p>
-                    )}
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-[#696969]">Order Total</span>
-                      <span className="font-serif text-xl">₹{totalPrice.toFixed(2)}</span>
+                  <div className="mt-6 border-t border-gray-100 pt-4">
+                    {checkoutError && <p className="mb-3 text-xs text-red-500">{checkoutError}</p>}
+                    <div className="mb-4 flex items-center justify-between">
+                      <span className="text-[#566577]">Order Total</span>
+                      <span className="font-display text-xl font-semibold">₹{totalPrice.toFixed(2)}</span>
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={isPlacingOrder}
-                      className="w-full py-4 bg-[#8b6d4b] text-white font-light tracking-widest btn-hover"
-                    >
+                    <button type="submit" disabled={isPlacingOrder} className="w-full bg-[#0f5da0] py-4 font-semibold text-white">
                       {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setCheckoutStep('cart')}
                       disabled={isPlacingOrder}
-                      className="w-full py-3 mt-3 text-[#696969] font-light tracking-wide hover:text-black transition-colors"
+                      className="mt-3 w-full py-3 font-medium text-[#566577] hover:text-black"
                     >
                       Back to Cart
                     </button>
                   </div>
                 </form>
               ) : cartItems.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <ShoppingBag size={48} className="text-gray-300 mb-4" strokeWidth={1} />
-                  <p className="text-[#696969] text-lg">{navigationConfig.cartEmptyText}</p>
-                  <button
-                    onClick={closeCart}
-                    className="mt-6 px-8 py-3 bg-[#8b6d4b] text-white font-light tracking-wide btn-hover"
-                  >
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <ShoppingBag size={48} className="mb-4 text-gray-300" strokeWidth={1} />
+                  <p className="text-lg text-[#566577]">{navigationConfig.cartEmptyText}</p>
+                  <button onClick={closeCart} className="mt-6 rounded-sm bg-[#0f5da0] px-8 py-3 font-semibold text-white">
                     {navigationConfig.continueShoppingText}
                   </button>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-4 pb-6 border-b border-gray-100">
-                      <div className="w-24 h-24 bg-[#fafafa] overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+                    <div key={item.id} className="flex gap-4 border-b border-gray-100 pb-6">
+                      <div className="h-24 w-24 overflow-hidden bg-[#f6f8fb]">
+                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-serif text-lg">{item.name}</h4>
-                        <p className="text-[#aea4a4] mt-1">₹{item.price.toFixed(2)}</p>
-                        <div className="flex items-center gap-3 mt-3">
+                        <h4 className="font-display text-lg font-semibold">{item.name}</h4>
+                        <p className="mt-1 text-[#748396]">₹{item.price.toFixed(2)}</p>
+                        <div className="mt-3 flex items-center gap-3">
                           <button
                             onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
-                            className="w-8 h-8 flex items-center justify-center border border-gray-200 hover:border-[#8b6d4b] transition-colors"
+                            className="flex h-8 w-8 items-center justify-center border border-gray-200 transition-colors hover:border-[#0f5da0]"
                           >
                             -
                           </button>
                           <span className="w-8 text-center">{item.quantity}</span>
                           <button
                             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                            className="w-8 h-8 flex items-center justify-center border border-gray-200 hover:border-[#8b6d4b] transition-colors"
+                            className="flex h-8 w-8 items-center justify-center border border-gray-200 transition-colors hover:border-[#0f5da0]"
                           >
                             +
                           </button>
                         </div>
                       </div>
-                      <button
-                        onClick={() => onRemoveFromCart(item.id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
+                      <button onClick={() => onRemoveFromCart(item.id)} className="text-gray-400 transition-colors hover:text-red-500">
                         <X size={18} />
                       </button>
                     </div>
@@ -550,21 +540,15 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
             </div>
 
             {cartItems.length > 0 && (
-              <div className="p-6 border-t bg-[#fafafa]">
-                <div className="flex items-center justify-between mb-6">
+              <div className="border-t bg-[#f6f8fb] p-6">
+                <div className="mb-6 flex items-center justify-between">
                   <span className="text-lg">Subtotal</span>
-                  <span className="font-serif text-xl">₹{totalPrice.toFixed(2)}</span>
+                  <span className="font-display text-xl font-semibold">₹{totalPrice.toFixed(2)}</span>
                 </div>
-                <button
-                  onClick={() => setCheckoutStep('details')}
-                  className="w-full py-4 bg-[#8b6d4b] text-white font-light tracking-widest btn-hover"
-                >
+                <button onClick={() => setCheckoutStep('details')} className="w-full bg-[#0f5da0] py-4 font-semibold text-white">
                   {navigationConfig.cartCheckoutText}
                 </button>
-                <button
-                  onClick={closeCart}
-                  className="w-full py-3 mt-3 text-[#696969] font-light tracking-wide hover:text-black transition-colors"
-                >
+                <button onClick={closeCart} className="mt-3 w-full py-3 font-medium text-[#566577] hover:text-black">
                   {navigationConfig.continueShoppingText}
                 </button>
               </div>
