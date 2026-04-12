@@ -13,7 +13,8 @@ import { z } from 'zod';
 dotenv.config();
 
 const app = express();
-const PORT = Number(process.env.API_PORT ?? 4000);
+const PORT = Number(process.env.PORT ?? process.env.API_PORT ?? 4000);
+const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*';
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_REGISTRATION_ENABLED = process.env.ALLOW_ADMIN_REGISTRATION === 'true';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? '';
@@ -169,7 +170,14 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-app.use(cors());
+const corsOptions =
+  CORS_ORIGIN === '*'
+    ? undefined
+    : {
+        origin: CORS_ORIGIN.split(',').map((origin) => origin.trim()),
+      };
+
+app.use(cors(corsOptions));
 app.use(
   express.json({
     verify: (request, _response, buffer) => {

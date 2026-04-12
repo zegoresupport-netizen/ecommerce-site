@@ -5,7 +5,7 @@ const Footer = () => {
   if (!footerConfig.brandName) return null;
 
   const companyLinks = [
-    'About WaterScience',
+    'About Pure Water',
     'Team',
     'Careers',
     'Dealership/ Distributorship',
@@ -60,7 +60,7 @@ const Footer = () => {
             <ul className="space-y-4 text-[16px] text-[#2f3f4f]">
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-[#0f5da0]" />
-                care@waterscience.in
+                care@purewater.in
               </li>
               <li className="flex items-center gap-3">
                 <PhoneCall size={18} className="text-[#0f5da0]" />
@@ -76,14 +76,14 @@ const Footer = () => {
               <p>
                 <span className="font-semibold text-[#1e2b38]">Manufacturer Name</span> -
                 <br />
-                Aquagenics R and D India Pvt. Ltd.
+                Pure Water Technologies Pvt. Ltd.
               </p>
               <p>
                 <span className="font-semibold text-[#1e2b38]">Manufacturer Address</span> - A31,
                 <br />
-                NGEF Estate, Whitefield Main Rd,
+                Industrial Estate, Phase 1,
                 <br />
-                Mahadevapura, Bengaluru,
+                Bengaluru,
                 <br />
                 Karnataka 560048
               </p>

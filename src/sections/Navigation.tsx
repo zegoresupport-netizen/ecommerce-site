@@ -253,8 +253,8 @@ const Navigation = ({ cartItems, onRemoveFromCart, onUpdateQuantity, onClearCart
               }}
               className="flex flex-1 items-center justify-center gap-2 text-[#0f5da0]"
             >
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[#0f5da0] text-white">W</span>
-              <span className="text-2xl font-extrabold tracking-tight">waterscience</span>
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[#0f5da0] text-white">PW</span>
+              <span className="text-2xl font-extrabold tracking-tight">{navigationConfig.brandName}</span>
             </a>
 
             <div className="flex flex-1 items-center justify-end gap-3">
