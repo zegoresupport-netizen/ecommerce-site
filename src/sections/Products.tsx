@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Check } from 'lucide-react';
 import { productsConfig } from '../config';
 import type { Product } from '@/types/product';
+import { API_BASE_URL } from '@/lib/api-base-url';
 
 interface ProductsProps {
   onAddToCart: (product: Product) => void;
 }
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 const Products = ({ onAddToCart }: ProductsProps) => {
   if (!productsConfig.heading) return null;

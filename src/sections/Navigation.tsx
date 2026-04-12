@@ -1,8 +1,8 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { ShoppingBag, X, Search, Instagram, Facebook, Twitter } from 'lucide-react';
 import { navigationConfig } from '../config';
+import { API_BASE_URL } from '@/lib/api-base-url';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 const IS_DEMO_MODE = (import.meta.env.VITE_DEMO_MODE ?? 'true').toLowerCase() === 'true';
 
 interface CartItem {
