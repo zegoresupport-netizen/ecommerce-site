@@ -169,15 +169,8 @@ export const productsConfig: ProductsConfig = {
   viewAllText: "View All Products",
   addToCartText: "Add to Cart",
   addedToCartText: "Added!",
-  categories: ["All", "Shower Filters", "Tap Filters", "Water Softeners", "Replacement Cartridges", "Accessories"],
-  products: [
-    { id: 1, name: "CLEO Shower Filter SF-717", price: 2295, category: "Shower Filters", image: "images/product_shower_filter.jpg" },
-    { id: 2, name: "Kitchen Tap Filter TF-200", price: 1495, category: "Tap Filters", image: "images/product_tap_filter.jpg" },
-    { id: 3, name: "Whole House Softener WH-500", price: 24995, category: "Water Softeners", image: "images/product_softener.jpg" },
-    { id: 4, name: "Replacement Cartridge RC-100", price: 795, category: "Replacement Cartridges", image: "images/product_cartridge.jpg" },
-    { id: 5, name: "Appliance Filter AF-50", price: 1295, category: "Tap Filters", image: "images/product_appliance_filter.jpg" },
-    { id: 6, name: "Water Saving Aerator WS-30", price: 495, category: "Accessories", image: "images/product_aerator.jpg" },
-  ],
+  categories: ["All"],
+  products: [],
 };
 
 // ─── Features ────────────────────────────────────────────────────────────────

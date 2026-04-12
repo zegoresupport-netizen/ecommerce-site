@@ -6,7 +6,7 @@ const FAQ = () => {
   if (!faqConfig.heading && faqConfig.faqs.length === 0) return null;
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [openId, setOpenId] = useState<number | null>(null);
 
   useEffect(() => {

@@ -6,7 +6,7 @@ const Blog = () => {
   if (!blogConfig.heading && blogConfig.posts.length === 0) return null;
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "ADMIN-0001",
+    "name": "Store Admin",
+    "email": "admin@pureflow.com",
+    "passwordHash": "$2b$12$fiidmTbJAs5bcSqTj00KweW9K10/bFkVVTO6PFBdmfvFMgsVbLpF.",
+    "createdAt": "2026-04-05T13:56:56.365Z"
+  }
+]

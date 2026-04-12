@@ -1,0 +1,22 @@
+[
+  {
+    "sku": "DKM",
+    "name": "leo das filter",
+    "category": "Filter",
+    "unitPrice": 454,
+    "stock": 52,
+    "reorderLevel": 5,
+    "supplier": "Catalog Auto Sync",
+    "updatedAt": "2026-04-08T05:49:39.871Z"
+  },
+  {
+    "sku": "PHP",
+    "name": "LK dispensor",
+    "category": "Dispenser",
+    "unitPrice": 500,
+    "stock": 2,
+    "reorderLevel": 5,
+    "supplier": "Catalog Auto Sync",
+    "updatedAt": "2026-04-08T06:26:27.672Z"
+  }
+]

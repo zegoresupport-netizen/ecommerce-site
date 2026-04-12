@@ -1,0 +1,42 @@
+[
+  {
+    "id": "CUST-0005",
+    "name": "Mani Kandan",
+    "email": "manikandan@gmail.com",
+    "orders": 1,
+    "spend": 500,
+    "updatedAt": "2026-04-08T06:26:27.675Z"
+  },
+  {
+    "id": "CUST-0004",
+    "name": "Demo Buyer",
+    "email": "demo.buyer@example.com",
+    "orders": 1,
+    "spend": 454,
+    "updatedAt": "2026-04-08T05:49:39.875Z"
+  },
+  {
+    "id": "CUST-0003",
+    "name": "user test",
+    "email": "usertest@gmail.com",
+    "orders": 1,
+    "spend": 1000,
+    "updatedAt": "2026-04-05T14:35:53.547Z"
+  },
+  {
+    "id": "CUST-0002",
+    "name": "Stock Test User",
+    "email": "stock.test@example.com",
+    "orders": 1,
+    "spend": 454,
+    "updatedAt": "2026-04-05T14:32:00.291Z"
+  },
+  {
+    "id": "CUST-0001",
+    "name": "Rahul Test",
+    "email": "rahul.test@example.com",
+    "orders": 1,
+    "spend": 999,
+    "updatedAt": "2026-04-05T14:13:24.832Z"
+  }
+]

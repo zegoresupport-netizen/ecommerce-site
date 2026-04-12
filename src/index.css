@@ -47,7 +47,14 @@
   }
   
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.15s !important;
   }
   
   body {
@@ -161,38 +168,38 @@
   }
   
   .card-hover {
-    transition: all 0.3s ease-in-out;
+    transition: none;
   }
   
   .card-hover:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    transform: none;
+    box-shadow: none;
   }
   
   .link-hover {
-    transition: all 0.4s ease-in-out;
+    transition: none;
   }
   
   .link-hover:hover {
-    transform: translateX(5px);
+    transform: none;
     color: var(--shibumi-black);
   }
   
   .btn-hover {
-    transition: all 0.4s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
   }
   
   .btn-hover:hover {
-    opacity: 0.85;
-    transform: translateY(-2px);
+    opacity: 0.92;
+    transform: none;
   }
   
   .image-scale {
-    transition: transform 0.3s ease-in-out;
+    transition: none;
   }
   
   .image-scale:hover img {
-    transform: scale(1.1);
+    transform: none;
   }
   
   .scrollbar-hide {

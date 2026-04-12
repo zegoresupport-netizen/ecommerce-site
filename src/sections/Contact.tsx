@@ -6,7 +6,7 @@ const Contact = () => {
   if (!contactConfig.heading) return null;
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

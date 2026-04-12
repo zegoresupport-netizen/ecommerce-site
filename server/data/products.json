@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "sku": "DKM",
+    "name": "leo das filter",
+    "price": 454,
+    "category": "Filter",
+    "stock": 48,
+    "image": "https://www.irawaters.net/assets/images/products/kitchen-water-filter.jpg",
+    "description": "this is the dummy data",
+    "longDescription": "leo leo leoejhdldefisefslkfjsfhjvsgkfmnsdbfvjhfmdbnvdnvdvdsbfkughyjhbghjghyfsigfshbs"
+  },
+  {
+    "id": 2,
+    "sku": "PHP",
+    "name": "LK dispensor",
+    "price": 500,
+    "category": "Dispenser",
+    "stock": 4,
+    "image": "https://m.media-amazon.com/images/I/617La9QfBCL._AC_UF350,350_QL80_.jpg",
+    "description": "Water dispensers come in several styles to suit different spaces and hydration needs, ranging from simple portable pumps to large floor-standing units with refrigeration",
+    "longDescription": "Bottom-Loading Dispensers: These house the water bottle in a lower cabinet, eliminating the need to lift heavy jugs. They often feature sleek designs and multiple temperature settings. Top-Loading with Storage/Cooling Cabinet: These traditional units place the bottle on top and often include an 18-litre cooling cabinet or \"mini-fridge\" at the bottom for storing beverages. Tabletop & Countertop Models: Compact units designed for small kitchens or office desks. They provide the same hot and cold functionality but take up minimal surface area. Portable Electric Pumps: Budget-friendly, rechargeable devices that attach directly to the neck of a 20-litre bottle. They are ideal for camping, travel, or small household"
+  }
+]

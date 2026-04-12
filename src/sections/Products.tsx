@@ -1,19 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Check } from 'lucide-react';
 import { productsConfig } from '../config';
-import type { Product } from '../config';
+import type { Product } from '@/types/product';
 
 interface ProductsProps {
   onAddToCart: (product: Product) => void;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
+
 const Products = ({ onAddToCart }: ProductsProps) => {
-  if (!productsConfig.heading && productsConfig.products.length === 0) return null;
+  if (!productsConfig.heading) return null;
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(productsConfig.categories[0] || 'All');
+  const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [addedItems, setAddedItems] = useState<number[]>([]);
+
+  const categories = ['All', ...Array.from(new Set(products.map((product) => product.category)))];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,9 +42,32 @@ const Products = ({ onAddToCart }: ProductsProps) => {
     return () => observer.disconnect();
   }, []);
 
-  const filteredProducts = activeCategory === productsConfig.categories[0]
-    ? productsConfig.products
-    : productsConfig.products.filter(p => p.category === activeCategory);
+  useEffect(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+      setError('');
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/products`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+
+        const payload = (await response.json()) as { items: Product[] };
+        setProducts(payload.items ?? []);
+      } catch {
+        setError('Unable to load products right now.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadProducts();
+  }, []);
+
+  const filteredProducts = activeCategory === 'All'
+    ? products
+    : products.filter((product) => product.category === activeCategory);
 
   const handleAddToCart = (product: Product) => {
     onAddToCart(product);
@@ -44,6 +76,9 @@ const Products = ({ onAddToCart }: ProductsProps) => {
       setAddedItems(prev => prev.filter(id => id !== product.id));
     }, 2000);
   };
+
+  const truncate = (value: string, maxLength: number) =>
+    value.length > maxLength ? `${value.slice(0, maxLength).trim()}...` : value;
 
   return (
     <section
@@ -80,14 +115,14 @@ const Products = ({ onAddToCart }: ProductsProps) => {
         </div>
 
         {/* Category Filter */}
-        {productsConfig.categories.length > 0 && (
+        {categories.length > 0 && (
           <div
             className={`flex flex-wrap justify-center gap-4 mb-12 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
             style={{ transitionDelay: '600ms' }}
           >
-            {productsConfig.categories.map((category) => (
+            {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
@@ -104,6 +139,10 @@ const Products = ({ onAddToCart }: ProductsProps) => {
         )}
 
         {/* Products Grid */}
+        {isLoading && <p className="text-center text-[#696969]">Loading products...</p>}
+        {!isLoading && error && <p className="text-center text-red-600">{error}</p>}
+
+        {!isLoading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((product, index) => (
             <div
@@ -114,7 +153,18 @@ const Products = ({ onAddToCart }: ProductsProps) => {
               style={{ transitionDelay: `${800 + index * 100}ms` }}
             >
               {/* Image Container */}
-              <div className="relative h-[400px] overflow-hidden bg-[#fafafa]">
+              <div
+                onClick={() => navigate(`/product/${product.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    navigate(`/product/${product.id}`);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                className="relative h-[400px] w-full overflow-hidden bg-[#fafafa] text-left"
+              >
                 <img
                   src={product.image}
                   alt={product.name}
@@ -123,7 +173,10 @@ const Products = ({ onAddToCart }: ProductsProps) => {
 
                 {/* Quick Add Button */}
                 <button
-                  onClick={() => handleAddToCart(product)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleAddToCart(product);
+                  }}
                   className={`absolute bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 flex items-center gap-2 text-sm tracking-wide transition-all duration-300 ${
                     addedItems.includes(product.id)
                       ? 'bg-green-600 text-white'
@@ -145,14 +198,21 @@ const Products = ({ onAddToCart }: ProductsProps) => {
               </div>
 
               {/* Product Info */}
-              <div className="p-5 bg-white">
-                <span className="text-xs text-[#aea4a4] tracking-wide uppercase">{product.category}</span>
-                <h3 className="font-serif text-xl text-black mt-1">{product.name}</h3>
-                <p className="text-[#aea4a4] font-medium mt-2">${product.price.toFixed(2)}</p>
+              <div className="flex flex-col p-5 bg-white">
+                <span className="mb-1 block text-xs text-[#888888] tracking-wide uppercase">{product.category}</span>
+                <button
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  className="mt-1 text-left"
+                >
+                  <h3 className="font-serif text-xl text-black hover:text-[#8b6d4b] transition-colors">{product.name}</h3>
+                </button>
+                <p className="mt-2 text-sm text-[#696969]">{truncate(product.description, 90)}</p>
+                <p className="text-[#aea4a4] font-medium mt-2">₹{product.price.toFixed(2)}</p>
               </div>
             </div>
           ))}
         </div>
+        )}
 
         {/* View All Link */}
         {productsConfig.viewAllText && (

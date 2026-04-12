@@ -12,7 +12,7 @@ interface AboutSectionProps {
 
 const AboutSection = ({ id, image, contentBg, textColor, reverse, children }: AboutSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
