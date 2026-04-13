@@ -8,7 +8,10 @@ Create `.env` in the app root (example in `.env.example`):
 
 ```bash
 API_PORT=4000
+PORT=4000
 JWT_SECRET=replace-with-a-long-random-secret
+CLIENT_ORIGIN=http://localhost:5173
+ALLOWED_ORIGINS=http://localhost:5173
 ALLOW_ADMIN_REGISTRATION=false
 DEMO_MODE=true
 VITE_DEMO_MODE=true
@@ -23,6 +26,9 @@ SHIPROCKET_PICKUP_LOCATION=Primary
 ```
 
 - `JWT_SECRET` is required to sign/verify admin JWTs.
+- `PORT` is used by Render. Keep `API_PORT` for local/dev compatibility.
+- `CLIENT_ORIGIN` (or `ALLOWED_ORIGINS`) controls CORS. For production, set it to your Netlify site URL.
+- `ALLOWED_ORIGINS` accepts comma-separated origins when you have multiple frontends.
 - `ALLOW_ADMIN_REGISTRATION` should be `true` only while creating your first admin account, then set back to `false`.
 - Stripe + Shiprocket keys are required for payment-to-logistics automation.
 

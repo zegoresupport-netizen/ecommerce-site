@@ -13,7 +13,7 @@ import { z } from 'zod';
 dotenv.config();
 
 const app = express();
-const PORT = Number(process.env.API_PORT ?? 4000);
+const PORT = Number(process.env.PORT ?? process.env.API_PORT ?? 4000);
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_REGISTRATION_ENABLED = process.env.ALLOW_ADMIN_REGISTRATION === 'true';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? '';
@@ -25,6 +25,10 @@ const SHIPROCKET_EMAIL = process.env.SHIPROCKET_EMAIL ?? '';
 const SHIPROCKET_PASSWORD = process.env.SHIPROCKET_PASSWORD ?? '';
 const SHIPROCKET_PICKUP_LOCATION = process.env.SHIPROCKET_PICKUP_LOCATION ?? 'Primary';
 const DEMO_MODE = String(process.env.DEMO_MODE ?? 'true').toLowerCase() === 'true';
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS ?? process.env.CLIENT_ORIGIN ?? '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is required. Add it to your .env file.');
@@ -169,7 +173,18 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
+  })
+);
 app.use(
   express.json({
     verify: (request, _response, buffer) => {

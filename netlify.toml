@@ -2,8 +2,8 @@
   command = "npm run build"
   publish = "dist"
 
-# Set VITE_API_BASE_URL in Netlify Environment Variables to your Render backend URL,
-# for example: https://your-backend-service.onrender.com
+# Set VITE_API_BASE_URL in Netlify Environment Variables to your REAL Render backend URL,
+# for example: https://mousim-shop-api.onrender.com
 
 [[redirects]]
   from = "/*"

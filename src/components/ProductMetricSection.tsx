@@ -1,8 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ProductMetricCard from './ProductMetricCard';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
+import { API_BASE_URL } from '@/lib/api-base-url';
 
 interface ProductMetricItem {
   id: number | null;
