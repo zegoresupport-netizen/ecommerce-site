@@ -1,34 +1,113 @@
-import { useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { heroConfig } from '../config';
 
 const Hero = () => {
   if (!heroConfig.title) return null;
 
-  const cleanTitle = useMemo(() => heroConfig.title.replace(/\n/g, ' '), []);
+  const [isVisible, setIsVisible] = useState(true);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const scrollToNext = () => {
+    const nextSection = document.querySelector('#subhero');
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const titleLines = heroConfig.title.split('\n');
 
   return (
-    <section id="hero" className="bg-[#f5f7fb] pt-4 md:pt-6">
-      <div className="mx-auto max-w-[1240px] px-4 md:px-6">
-        <div className="relative overflow-hidden rounded-sm border border-[#dfe5eb]">
-          <img
-            src={heroConfig.backgroundImage}
-            alt="Water solutions banner"
-            className="h-[250px] w-full object-cover md:h-[320px]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/45 to-white/85" />
-          <div className="absolute inset-0 flex items-center justify-center px-6 md:justify-end md:px-16">
-            <div className="max-w-[460px] text-center md:text-right">
-              <p className="mb-2 text-xs font-semibold tracking-[0.15em] text-[#0f5da0] md:text-sm">
-                {heroConfig.tagline}
-              </p>
-              <h1 className="font-display text-[34px] font-semibold leading-tight text-[#20242a] md:text-[56px]">
-                {cleanTitle}
-              </h1>
-              <p className="mt-2 text-base text-[#3d4d5b] md:text-xl">Range of Filters and Softeners</p>
-            </div>
-          </div>
+    <section
+      id="hero"
+      ref={heroRef}
+      className="relative h-screen w-full overflow-hidden"
+    >
+      {/* Parallax Background */}
+      <div
+        className="absolute inset-0 parallax-bg"
+        style={{
+          backgroundImage: `url(${heroConfig.backgroundImage})`,
+        }}
+      />
+
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/30" />
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col items-center justify-center text-center text-white px-6">
+        <div
+          className={`transition-all duration-1000 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: '300ms' }}
+        >
+          <span className="inline-block mb-4 text-sm tracking-[0.3em] font-light uppercase">
+            {heroConfig.tagline}
+          </span>
+        </div>
+
+        <h1
+          className={`font-serif text-4xl md:text-6xl lg:text-7xl max-w-4xl leading-tight transition-all duration-1000 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: '500ms' }}
+        >
+          {titleLines.map((line, i) => (
+            <span key={i}>
+              {line}
+              {i < titleLines.length - 1 && <br />}
+            </span>
+          ))}
+        </h1>
+
+        <div
+          className={`mt-10 flex flex-col sm:flex-row gap-4 transition-all duration-1000 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: '900ms' }}
+        >
+          {heroConfig.ctaPrimaryText && (
+            <a
+              href={heroConfig.ctaPrimaryTarget}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector(heroConfig.ctaPrimaryTarget)?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-12 py-4 bg-[#8b6d4b] text-white font-light tracking-widest text-sm btn-hover"
+            >
+              {heroConfig.ctaPrimaryText}
+            </a>
+          )}
+          {heroConfig.ctaSecondaryText && (
+            <a
+              href={heroConfig.ctaSecondaryTarget}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector(heroConfig.ctaSecondaryTarget)?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-12 py-4 border border-white text-white font-light tracking-widest text-sm hover:bg-white hover:text-black transition-all duration-300"
+            >
+              {heroConfig.ctaSecondaryText}
+            </a>
+          )}
         </div>
       </div>
+
+      {/* Scroll Indicator */}
+      <button
+        onClick={scrollToNext}
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 text-white animate-bounce transition-opacity duration-1000 ${
+          isVisible ? 'opacity-70' : 'opacity-0'
+        }`}
+        style={{ transitionDelay: '1200ms' }}
+      >
+        <ChevronDown size={32} strokeWidth={1} />
+      </button>
     </section>
   );
 };

@@ -13,8 +13,7 @@ import { z } from 'zod';
 dotenv.config();
 
 const app = express();
-const PORT = Number(process.env.PORT ?? process.env.API_PORT ?? 4000);
-const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*';
+const PORT = Number(process.env.API_PORT ?? 4000);
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_REGISTRATION_ENABLED = process.env.ALLOW_ADMIN_REGISTRATION === 'true';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? '';
@@ -170,14 +169,7 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-const corsOptions =
-  CORS_ORIGIN === '*'
-    ? undefined
-    : {
-        origin: CORS_ORIGIN.split(',').map((origin) => origin.trim()),
-      };
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(
   express.json({
     verify: (request, _response, buffer) => {
@@ -931,6 +923,93 @@ app.get('/api/products', async (request, response, next) => {
     });
 
     response.status(200).json({ count: filtered.length, items: filtered });
+  } catch (error) {
+    next(error);
+  }
+});
+
+const buildProductPerformance = async () => {
+  const [products, orders] = await Promise.all([readProducts(), readOrders()]);
+
+  const performanceMap = new Map();
+
+  const findProductFromItem = (item) => {
+    if (item.sku) {
+      const bySku = products.find((product) => String(product.sku ?? '').toLowerCase() === String(item.sku).toLowerCase());
+      if (bySku) return bySku;
+    }
+
+    if (item.productId) {
+      const byId = products.find((product) => Number(product.id) === Number(item.productId));
+      if (byId) return byId;
+    }
+
+    if (item.name) {
+      return products.find((product) => String(product.name).toLowerCase() === String(item.name).toLowerCase()) ?? null;
+    }
+
+    return null;
+  };
+
+  for (const order of orders) {
+    const orderItems = Array.isArray(order.items) ? order.items : [];
+
+    for (const item of orderItems) {
+      const matchedProduct = findProductFromItem(item);
+      const key = String(item.sku ?? item.productId ?? item.name ?? matchedProduct?.id ?? '').toLowerCase();
+
+      if (!key) {
+        continue;
+      }
+
+      const quantity = Number(item.quantity ?? 0);
+      const unitPrice = Number(item.price ?? matchedProduct?.price ?? 0);
+      const revenue = unitPrice * quantity;
+
+      if (!performanceMap.has(key)) {
+        performanceMap.set(key, {
+          id: matchedProduct?.id ?? item.productId ?? null,
+          sku: matchedProduct?.sku ?? item.sku ?? null,
+          name: matchedProduct?.name ?? item.name ?? 'Product',
+          price: Number(matchedProduct?.price ?? unitPrice ?? 0),
+          image: matchedProduct?.image ?? '',
+          totalSold: 0,
+          revenue: 0,
+        });
+      }
+
+      const entry = performanceMap.get(key);
+      entry.totalSold += quantity;
+      entry.revenue += revenue;
+    }
+  }
+
+  return Array.from(performanceMap.values());
+};
+
+app.get('/api/products/best-sellers', async (_request, response, next) => {
+  try {
+    const performance = await buildProductPerformance();
+    const items = performance
+      .filter((item) => item.totalSold > 0)
+      .sort((a, b) => b.totalSold - a.totalSold)
+      .slice(0, 12);
+
+    response.status(200).json({ count: items.length, items });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get('/api/products/top-purchases', async (_request, response, next) => {
+  try {
+    const performance = await buildProductPerformance();
+    const items = performance
+      .filter((item) => item.revenue > 0)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 12);
+
+    response.status(200).json({ count: items.length, items });
   } catch (error) {
     next(error);
   }

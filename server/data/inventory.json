@@ -4,10 +4,10 @@
     "name": "leo das filter",
     "category": "Filter",
     "unitPrice": 454,
-    "stock": 52,
+    "stock": 109,
     "reorderLevel": 5,
     "supplier": "Catalog Auto Sync",
-    "updatedAt": "2026-04-08T05:49:39.871Z"
+    "updatedAt": "2026-04-12T13:45:18.756Z"
   },
   {
     "sku": "PHP",

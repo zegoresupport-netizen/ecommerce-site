@@ -7,9 +7,13 @@ import Navigation from './sections/Navigation';
 import AdminDashboard from './sections/AdminDashboard';
 import Login from './sections/Login';
 import Hero from './sections/Hero';
+import BestSellers from './sections/BestSellers';
+import TopPurchases from './sections/TopPurchases';
 import Products from './sections/Products';
-import StoreHighlights from './sections/StoreHighlights';
 import ProductDetail from './sections/ProductDetail';
+import Features from './sections/Features';
+import FAQ from './sections/FAQ';
+import Contact from './sections/Contact';
 import Footer from './sections/Footer';
 
 interface CartItem {
@@ -83,8 +87,12 @@ function App() {
               />
               <main>
                 <Hero />
+                <BestSellers />
+                <TopPurchases />
                 <Products onAddToCart={handleAddToCart} />
-                <StoreHighlights />
+                <Features />
+                <FAQ />
+                <Contact />
               </main>
               <Footer />
             </>

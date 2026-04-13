@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Product } from '@/types/product';
-import { API_BASE_URL } from '@/lib/api-base-url';
 
 interface ProductDetailProps {
   onAddToCart: (product: Product) => void;
 }
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 const ProductDetail = ({ onAddToCart }: ProductDetailProps) => {
   const navigate = useNavigate();

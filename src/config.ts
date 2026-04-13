@@ -7,7 +7,7 @@ export interface SiteConfig {
 }
 
 export const siteConfig: SiteConfig = {
-  title: "Pure Water - Premium Water Filtration Solutions",
+  title: "PureFlow Filters - Premium Water Filtration Solutions",
   description: "Transform your water quality with our premium shower filters, tap filters, water softeners, and replacement cartridges. Experience clean, pure water for your home and family.",
   language: "en",
 };
@@ -37,12 +37,10 @@ export interface NavigationConfig {
 }
 
 export const navigationConfig: NavigationConfig = {
-  brandName: "Pure Water",
+  brandName: "PureFlow",
   menuLinks: [
     { label: "Home", href: "#" },
     { label: "Products", href: "#products" },
-    { label: "About Us", href: "#about" },
-    { label: "Blog", href: "#blog" },
     { label: "FAQ", href: "#faq" },
     { label: "Contact", href: "#contact" },
   ],
@@ -438,13 +436,13 @@ export interface FooterConfig {
 }
 
 export const footerConfig: FooterConfig = {
-  brandName: "Pure Water",
+  brandName: "PureFlow",
   brandDescription: "Premium water filtration solutions for a healthier home. Experience the difference of pure, clean water every day.",
   newsletterHeading: "Join Our Community",
   newsletterDescription: "Subscribe for exclusive offers, water tips, and new product announcements.",
   newsletterPlaceholder: "Enter your email",
   newsletterButtonText: "Subscribe",
-  newsletterSuccessText: "Welcome to Pure Water! Check your inbox for a special offer.",
+  newsletterSuccessText: "Welcome to PureFlow! Check your inbox for a special offer.",
   linkGroups: [
     {
       title: "Products",
@@ -483,7 +481,7 @@ export const footerConfig: FooterConfig = {
     { label: "Shipping Policy", href: "#" },
     { label: "Refund Policy", href: "#" },
   ],
-  copyrightText: "© 2026 Pure Water. All rights reserved.",
+  copyrightText: "© 2026 PureFlow. All rights reserved.",
   socialLinks: [
     { icon: "Instagram", label: "Instagram", href: "https://instagram.com" },
     { icon: "Facebook", label: "Facebook", href: "https://facebook.com" },
